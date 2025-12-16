@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zen MVP Wallet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 420px;
+      margin: auto;
+      background: #f9f9f9;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .box {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+
+    #balance {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .error {
+      color: red;
+    }
+
+    ul {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>💳 Zen Wallet MVP</h2>
+
+  <div class="box">
+    <div id="balance">Balance: 0</div>
+  </div>
+
+  <div class="box">
+    <input id="amount" type="number" placeholder="Enter amount" />
+    <button onclick="handleDeposit()">Deposit</button>
+    <button onclick="handleWithdraw()">Withdraw</button>
+    <p id="message"></p>
+  </div>
+
+  <div class="box">
+    <h3>📜 Transaction History</h3>
+    <ul id="transactions"></ul>
+  </div>
+
+  <script>
+    let balance = Number(localStorage.getItem("balance")) || 0;
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+    function saveData() {
+      localStorage.setItem("balance", balance);
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+    }
+
+    function updateUI() {
+      document.getElementById("balance").innerText = "Balance: " + balance;
+
+      const list = document.getElementById("transactions");
+      list.innerHTML = "";
+
+      transactions.forEach(tx => {
+        const li = document.createElement("li");
+        const sign = tx.type === "deposit" ? "+" : "-";
+        li.innerText = `${tx.type.toUpperCase()} ${sign}${tx.amount} — ${tx.date}`;
+        list.appendChild(li);
+      });
+    }
+
+    function handleDeposit() {
+      const amount = Number(document.getElementById("amount").value);
+      const message = document.getElementById("message");
+
+      if (amount <= 0) {
+        message.innerText = "❌ Invalid deposit amount";
+        message.className = "error";
+        return;
+      }
+
+      balance += amount;
+      transactions.push({
+        type: "deposit",
+        amount,
+        date: new Date().toLocaleString()
+      });
+
+      saveData();
+      message.innerText = "✅ Deposit successful";
+      message.className = "";
+      updateUI();
+    }
+
+    function handleWithdraw() {
+      const amount = Number(document.getElementById("amount").value);
+      const message = document.getElementById("message");
+
+      if (amount <= 0) {
+        message.innerText = "❌ Invalid withdrawal amount";
+        message.className = "error";
+        return;
+      }
+
+      if (amount > balance) {
+        message.innerText = "❌ Insufficient funds";
+        message.className = "error";
+        return;
+      }
+
+      balance -= amount;
+      transactions.push({
+        type: "withdraw",
+        amount,
+        date: new Date().toLocaleString()
+      });
+
+      saveData();
+      message.innerText = "✅ Withdrawal successful";
+      message.className = "";
+      updateUI();
+    }
+
+    updateUI();
+  </script>
+
+</body>
+</html>
