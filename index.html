@@ -74,7 +74,7 @@
     <button onclick="handleWithdraw()">Withdraw</button>
     <p id="message"></p>
   </div>
-
+<button onclick="resetWallet()">Reset Wallet</button>
   <div class="box">
     <h3>📜 Transaction History</h3>
     <ul id="transactions"></ul>
@@ -153,6 +153,20 @@
       message.innerText = "✅ Withdrawal successful";
       message.className = "";
       updateUI();
+    }function resetWallet() {
+        if (!confirm("Reset wallet and clear all data?")) return;
+
+          balance = 0;
+            transactions = [];
+
+              localStorage.removeItem("balance");
+                localStorage.removeItem("transactions");
+
+                  document.getElementById("message").innerText = "🔄 Wallet reset";
+                    document.getElementById("message").className = "";
+
+                      updateUI();
+                      }
     }
 
     updateUI();
